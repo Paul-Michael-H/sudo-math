@@ -1,5 +1,5 @@
 
-#[derive(Debug,Clone,PartialEq,Hash)]
+#[derive(Debug,Clone,PartialEq,Eq,Hash)]
 pub enum Digit {
     One,
     Two,
@@ -13,7 +13,6 @@ pub enum Digit {
 }
 
 pub type DigitValue = Option<Digit>;
-
 
 #[cfg(test)]
 mod tests {
