@@ -2,6 +2,7 @@ pub use super::digit::{Digit, DigitValue};
 
 #[derive(Debug, Clone)]
 pub struct Cell {
+    index: usize,
     column: usize,
     row: usize,
     section: usize,
@@ -9,31 +10,34 @@ pub struct Cell {
 }
 
 impl Cell {
-    fn new(column: usize, row: usize, section: usize, value: DigitValue) -> Self {
+    fn new(index: usize, column: usize, row: usize, section: usize, value: DigitValue) -> Self {
         Cell {
+            index: index,
             column: column,
             row: row,
             section: section,
             value: value,
-        }    
+        }
     }
-    pub fn get_column(&self) -> usize {
-        self.column
+    pub fn get_index(&self) -> &usize {
+        &self.index
     }
-    pub fn get_row(&self) -> usize {
-        self.row
+    pub fn get_column(&self) -> &usize {
+        &self.column
     }
-    pub fn get_section(&self) -> usize {
-        self.section
+    pub fn get_row(&self) -> &usize {
+        &self.row
+    }
+    pub fn get_section(&self) -> &usize {
+        &self.section
     }
     pub fn get_value(&self) -> &DigitValue {
         &self.value
     }
     pub fn set_value(&mut self, value: DigitValue) {
         self.value = value;
-    } 
+    }
 }
-
 
 #[derive(Debug, Clone)]
 pub struct GridDimensions {
@@ -56,9 +60,16 @@ impl GridDimensions {
         let mut result: Vec<Cell> = Vec::new();
         for column in 0..self.column_count {
             for row in 0..self.row_count {
-                result.push(Cell::new(column, row, self.get_section_for_position(column, row), None));
+                let index = column + row * self.column_count;
+                result.push(Cell::new(
+                    index,
+                    column,
+                    row,
+                    self.get_section_for_position(column, row),
+                    None,
+                ));
             }
-        }     
+        }
         result
     }
     pub fn is_valid(&self) -> bool {
@@ -85,13 +96,12 @@ impl GridDimensions {
     pub fn get_sections_in_column(&self) -> usize {
         self.column_count / self.section_height
     }
-    pub fn get_indices_for_row(&self, row: usize) -> Vec<usize>{
+    pub fn get_indices_for_row(&self, row: usize) -> Vec<usize> {
         if row < self.row_count {
             let first = row * self.column_count;
             let last = first + self.column_count;
             (first..last).collect()
-        }
-        else {
+        } else {
             Vec::new()
         }
     }
@@ -108,30 +118,34 @@ impl GridDimensions {
         let row = (section / self.get_sections_in_row()) * self.section_height + row_offset;
         row * self.column_count + column
     }
-    pub fn get_indices_for_column(&self, column: usize) -> Vec<usize>{
+    pub fn get_indices_for_column(&self, column: usize) -> Vec<usize> {
         if column < self.column_count {
             let first = 0usize;
             let last = self.row_count;
             let range: Vec<usize> = (first..last).collect();
             range.iter().map(|x| x * self.row_count + column).collect()
-        }
-        else {
+        } else {
             Vec::new()
         }
     }
-    pub fn get_indices_for_section(&self, section: usize) -> Vec<usize>{
+    pub fn get_indices_for_section(&self, section: usize) -> Vec<usize> {
         if section < self.get_section_count() {
             let first = 0usize;
             let last = self.get_section_size();
             let range: Vec<usize> = (first..last).collect();
-            range.iter().map(|x| self.get_index_for_section_index(section, *x)).collect()
-        }
-        else {
+            range
+                .iter()
+                .map(|x| self.get_index_for_section_index(section, *x))
+                .collect()
+        } else {
             Vec::new()
         }
     }
     pub fn get_section_for_position(&self, column: usize, row: usize) -> usize {
         row % self.section_width + (column % self.section_height) * self.get_sections_in_row()
+    }
+    pub fn get_data_size(&self) -> usize {
+        self.row_count*self.column_count
     }
 }
 

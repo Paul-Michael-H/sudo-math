@@ -4,3 +4,4 @@ pub mod griddimensions;
 // pub mod column;
 // pub mod section;
 pub mod sudoku;
+pub mod and_intersect;
