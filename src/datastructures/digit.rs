@@ -16,6 +16,7 @@ pub enum Digit {
 pub type DigitValue = Option<Digit>;
 pub type DigitHashSet = HashSet<Digit>;
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct DigitSet {
     data: Vec<DigitValue>,
 }

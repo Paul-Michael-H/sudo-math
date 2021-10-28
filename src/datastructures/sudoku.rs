@@ -47,6 +47,16 @@ impl Sudoku {
         }
     }
 
+    pub fn distribute_set_to_make_correct_sudoku(&mut self, digitset: DigitSet) {
+        let rotation_counts = vec![0usize,3,6,1,4,7,2,5,8];
+
+        for index in 0..9 {
+            let mut column = digitset.clone();
+            column.rotate_left(rotation_counts[index]);
+            self.update_column(index, column);
+        }
+    }
+    
     fn subset<'a>(&'a self, indices: Vec<usize>) -> impl Iterator<Item = &'a Cell> + 'a {
         let subset = indices.iter().map(|x| self.get_cell(*x).unwrap()).collect();
         SubSetIterator::new(subset)
@@ -328,24 +338,7 @@ mod tests {
     #[test]
     fn test_used_digits_for_correct_sudoku() {
         let mut mysudoku = Sudoku::new(9, 9, 3, 3);
-        let column = DigitSet::new_full();
-        mysudoku.update_column(0, column);
-        let column = DigitSet::new_full_and_rotate_left(3);
-        mysudoku.update_column(1, column);
-        let column = DigitSet::new_full_and_rotate_left(6);
-        mysudoku.update_column(2, column);
-        let column = DigitSet::new_full_and_rotate_left(1);
-        mysudoku.update_column(3, column);
-        let column = DigitSet::new_full_and_rotate_left(4);
-        mysudoku.update_column(4, column);
-        let column = DigitSet::new_full_and_rotate_left(7);
-        mysudoku.update_column(5, column);
-        let column = DigitSet::new_full_and_rotate_left(2);
-        mysudoku.update_column(6, column);
-        let column = DigitSet::new_full_and_rotate_left(5);
-        mysudoku.update_column(7, column);
-        let column = DigitSet::new_full_and_rotate_left(8);
-        mysudoku.update_column(8, column);
+        mysudoku.distribute_set_to_make_correct_sudoku(DigitSet::new_full());
         for i in 0usize..9usize {
             assert_eq!(mysudoku.used_digits_in_column(i).unwrap().iter().count(), 9, "column {}", i);
             assert_eq!(mysudoku.used_digits_in_row(i).unwrap().iter().count(), 9, "row {}", i);
