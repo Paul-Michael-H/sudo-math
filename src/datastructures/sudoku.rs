@@ -225,6 +225,9 @@ impl Sudoku {
                     .set_value(Some(*value_iter.next().unwrap()))
             });
     }
+    pub fn update_column(&mut self, column: usize, digitset: DigitSet) {
+        self.update_column(column, digitset.get_data())
+    }
 }
 
 #[cfg(test)]
@@ -327,11 +330,9 @@ mod tests {
     }
     #[test]
     fn test_used_digits_for_correct_sudoku() {
-        use super::super::digit::Digit::*;
-        let first_digit_set = vec![One, Two, Three, Four, Five, Six, Seven, Eight, Nine];
 
         let mut mysudoku = Sudoku::new(9, 9, 3, 3);
-        let column = vec![One, Two, Three, Four, Five, Six, Seven, Eight, Nine];
+        let column = DigitSet::new_full();
         mysudoku.update_column(0, column);
         let column = vec![Four, Five, Six, Seven, Eight, Nine, One, Two, Three];
         mysudoku.update_column(1, column);
