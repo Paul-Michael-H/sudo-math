@@ -1,7 +1,7 @@
 // how to implement a set?
 // a set is a non organised collection of items on which certain operations can take place
 // use super::column::ColumnIterator;
-use super::digit::{Digit, DigitValue};
+use super::digit::{Digit, DigitSet, DigitValue};
 use super::griddimensions::{Cell, GridDimensions};
 use std::collections::HashSet;
 // use super::row::RowIterator;
@@ -214,7 +214,7 @@ impl Sudoku {
         false
     }
 
-    pub fn update_column(&mut self, column: usize, values: Vec<Digit>) {
+    fn _update_column(&mut self, column: usize, values: Vec<DigitValue>) {
         let mut value_iter = values.iter();
         self.grid_dimensions
             .get_indices_for_column(column)
@@ -222,11 +222,11 @@ impl Sudoku {
             .for_each(|i| {
                 self.get_mut_cell(*i)
                     .unwrap()
-                    .set_value(Some(*value_iter.next().unwrap()))
+                    .set_value(*value_iter.next().unwrap_or(&None))
             });
     }
     pub fn update_column(&mut self, column: usize, digitset: DigitSet) {
-        self.update_column(column, digitset.get_data())
+        self._update_column(column, digitset.get_data())
     }
 }
 
@@ -324,31 +324,32 @@ mod tests {
         use super::super::digit::Digit::*;
 
         let mut mysudoku = Sudoku::new(9, 9, 3, 3);
-        let row = vec![One, Two, Three, Four, Five, Six, Seven, Eight, Nine];
+        let row = DigitSet::new_full();
         mysudoku.update_column(0, row);
         assert_eq!(mysudoku.used_digits_in_column(0).unwrap().iter().count(), 9);
     }
     #[test]
     fn test_used_digits_for_correct_sudoku() {
+        use super::super::digit::Digit::*;
 
         let mut mysudoku = Sudoku::new(9, 9, 3, 3);
         let column = DigitSet::new_full();
         mysudoku.update_column(0, column);
-        let column = vec![Four, Five, Six, Seven, Eight, Nine, One, Two, Three];
+        let column = DigitSet::new_full_and_rotate_left(3);
         mysudoku.update_column(1, column);
-        let column = vec![Seven, Eight, Nine, One, Two, Three, Four, Five, Six];
+        let column = DigitSet::new_full_and_rotate_left(6);
         mysudoku.update_column(2, column);
-        let column = vec![Two, Three, Four, Five, Six, Seven, Eight, Nine, One];
+        let column = DigitSet::new_full_and_rotate_left(1);
         mysudoku.update_column(3, column);
-        let column = vec![Five, Six, Seven, Eight, Nine, One, Two, Three, Four];
+        let column = DigitSet::new_full_and_rotate_left(4);
         mysudoku.update_column(4, column);
-        let column = vec![Eight, Nine, One, Two, Three, Four, Five, Six, Seven];
+        let column = DigitSet::new_full_and_rotate_left(7);
         mysudoku.update_column(5, column);
-        let column = vec![Three, Four, Five, Six, Seven, Eight, Nine, One, Two];
+        let column = DigitSet::new_full_and_rotate_left(2);
         mysudoku.update_column(6, column);
-        let column = vec![Six, Seven, Eight, Nine, One, Two, Three, Four, Five];
+        let column = DigitSet::new_full_and_rotate_left(5);
         mysudoku.update_column(7, column);
-        let column = vec![Nine, One, Two, Three, Four, Five, Six, Seven, Eight];
+        let column = DigitSet::new_full_and_rotate_left(8);
         mysudoku.update_column(8, column);
         assert_eq!(mysudoku.used_digits_in_column(0).unwrap().iter().count(), 9);
         assert_eq!(mysudoku.used_digits_in_column(1).unwrap().iter().count(), 9);
@@ -359,42 +360,6 @@ mod tests {
         assert_eq!(mysudoku.used_digits_in_column(6).unwrap().iter().count(), 9);
         assert_eq!(mysudoku.used_digits_in_column(7).unwrap().iter().count(), 9);
         assert_eq!(mysudoku.used_digits_in_column(8).unwrap().iter().count(), 9);
-        assert_eq!(
-            mysudoku.used_digits_in_section(0).unwrap().iter().count(),
-            9
-        );
-        assert_eq!(
-            mysudoku.used_digits_in_section(1).unwrap().iter().count(),
-            9
-        );
-        assert_eq!(
-            mysudoku.used_digits_in_section(2).unwrap().iter().count(),
-            9
-        );
-        assert_eq!(
-            mysudoku.used_digits_in_section(3).unwrap().iter().count(),
-            9
-        );
-        assert_eq!(
-            mysudoku.used_digits_in_section(4).unwrap().iter().count(),
-            9
-        );
-        assert_eq!(
-            mysudoku.used_digits_in_section(5).unwrap().iter().count(),
-            9
-        );
-        assert_eq!(
-            mysudoku.used_digits_in_section(6).unwrap().iter().count(),
-            9
-        );
-        assert_eq!(
-            mysudoku.used_digits_in_section(7).unwrap().iter().count(),
-            9
-        );
-        assert_eq!(
-            mysudoku.used_digits_in_section(8).unwrap().iter().count(),
-            9
-        );
         assert_eq!(mysudoku.used_digits_in_row(0).unwrap().iter().count(), 9);
         assert_eq!(mysudoku.used_digits_in_row(1).unwrap().iter().count(), 9);
         assert_eq!(mysudoku.used_digits_in_row(2).unwrap().iter().count(), 9);
@@ -404,13 +369,20 @@ mod tests {
         assert_eq!(mysudoku.used_digits_in_row(6).unwrap().iter().count(), 9);
         assert_eq!(mysudoku.used_digits_in_row(7).unwrap().iter().count(), 9);
         assert_eq!(mysudoku.used_digits_in_row(8).unwrap().iter().count(), 9);
+        assert_eq!(mysudoku.used_digits_in_section(0).unwrap().iter().count(), 9);
+        assert_eq!(mysudoku.used_digits_in_section(1).unwrap().iter().count(), 9);
+        assert_eq!(mysudoku.used_digits_in_section(2).unwrap().iter().count(), 9);
+        assert_eq!(mysudoku.used_digits_in_section(3).unwrap().iter().count(), 9);
+        assert_eq!(mysudoku.used_digits_in_section(4).unwrap().iter().count(), 9);
+        assert_eq!(mysudoku.used_digits_in_section(5).unwrap().iter().count(), 9);
+        assert_eq!(mysudoku.used_digits_in_section(6).unwrap().iter().count(), 9);
+        assert_eq!(mysudoku.used_digits_in_section(7).unwrap().iter().count(), 9);
+        assert_eq!(mysudoku.used_digits_in_section(8).unwrap().iter().count(), 9);
     }
     #[test]
     fn test_sort_cells_by_freedom() {
-        use super::super::digit::Digit::*;
-
         let mut mysudoku = Sudoku::new(9, 9, 3, 3);
-        let row = vec![One, Two, Three, Four, Five, Six, Seven, Eight, Nine];
+        let row = DigitSet::new_full();
         mysudoku.update_column(0, row);
         assert_eq!(mysudoku.used_digits_in_column(0).unwrap().iter().count(), 9);
     }

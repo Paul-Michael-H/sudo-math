@@ -41,6 +41,25 @@ impl DigitSet {
             ],
         }
     }
+    pub fn new_full_and_rotate_left(times: usize) -> Self {
+        use Digit::*;
+
+        let mut data = vec![
+            Some(One),
+            Some(Two),
+            Some(Three),
+            Some(Four),
+            Some(Five),
+            Some(Six),
+            Some(Seven),
+            Some(Eight),
+            Some(Nine),
+        ];
+        data.rotate_left(times);
+        DigitSet {
+            data: data,
+        }    
+    }
     pub fn contains(&self, digit: Digit) -> bool {
         self.data.contains(&Some(digit))
     }
