@@ -174,7 +174,7 @@ impl Sudoku {
         }
     }
 
-    fn get_mut_cell(&mut self, index: usize) -> Option<&mut Cell> {
+    pub fn get_mut_cell(&mut self, index: usize) -> Option<&mut Cell> {
         if index < self.grid_dimensions.get_data_size() {
             Some(&mut self.grid[index])
         } else {
@@ -182,16 +182,15 @@ impl Sudoku {
         }
     }
 
-    fn set_digit_for_cell(&mut self, index: usize, digit_value: DigitValue) {
-        if index < self.grid_dimensions.get_data_size() {
-            self.grid[index].set_value(digit_value);
-        }
-    }
+    // fn set_digit_for_cell(&mut self, index: usize, digit_value: DigitValue) {
+    //     if index < self.grid_dimensions.get_data_size() {
+    //         self.grid[index].set_value(digit_value);
+    //     }
+    // }
 
-    fn solve_cell(&self, cell: &Cell) -> DigitValue {
-        use super::digit::Digit::*;
-        Some(One)
-    }
+    // fn solve_cell(&self, cell: &Cell) -> DigitValue {
+    //     *cell.get_value()
+    // }
 
     pub fn solve(&mut self) -> bool {
         let mut row_sets: Vec<Option<HashSet<Digit>>> = Vec::new();
@@ -321,8 +320,6 @@ mod tests {
     }
     #[test]
     fn test_update_column() {
-        use super::super::digit::Digit::*;
-
         let mut mysudoku = Sudoku::new(9, 9, 3, 3);
         let row = DigitSet::new_full();
         mysudoku.update_column(0, row);
@@ -330,8 +327,6 @@ mod tests {
     }
     #[test]
     fn test_used_digits_for_correct_sudoku() {
-        use super::super::digit::Digit::*;
-
         let mut mysudoku = Sudoku::new(9, 9, 3, 3);
         let column = DigitSet::new_full();
         mysudoku.update_column(0, column);
@@ -351,33 +346,11 @@ mod tests {
         mysudoku.update_column(7, column);
         let column = DigitSet::new_full_and_rotate_left(8);
         mysudoku.update_column(8, column);
-        assert_eq!(mysudoku.used_digits_in_column(0).unwrap().iter().count(), 9);
-        assert_eq!(mysudoku.used_digits_in_column(1).unwrap().iter().count(), 9);
-        assert_eq!(mysudoku.used_digits_in_column(2).unwrap().iter().count(), 9);
-        assert_eq!(mysudoku.used_digits_in_column(3).unwrap().iter().count(), 9);
-        assert_eq!(mysudoku.used_digits_in_column(4).unwrap().iter().count(), 9);
-        assert_eq!(mysudoku.used_digits_in_column(5).unwrap().iter().count(), 9);
-        assert_eq!(mysudoku.used_digits_in_column(6).unwrap().iter().count(), 9);
-        assert_eq!(mysudoku.used_digits_in_column(7).unwrap().iter().count(), 9);
-        assert_eq!(mysudoku.used_digits_in_column(8).unwrap().iter().count(), 9);
-        assert_eq!(mysudoku.used_digits_in_row(0).unwrap().iter().count(), 9);
-        assert_eq!(mysudoku.used_digits_in_row(1).unwrap().iter().count(), 9);
-        assert_eq!(mysudoku.used_digits_in_row(2).unwrap().iter().count(), 9);
-        assert_eq!(mysudoku.used_digits_in_row(3).unwrap().iter().count(), 9);
-        assert_eq!(mysudoku.used_digits_in_row(4).unwrap().iter().count(), 9);
-        assert_eq!(mysudoku.used_digits_in_row(5).unwrap().iter().count(), 9);
-        assert_eq!(mysudoku.used_digits_in_row(6).unwrap().iter().count(), 9);
-        assert_eq!(mysudoku.used_digits_in_row(7).unwrap().iter().count(), 9);
-        assert_eq!(mysudoku.used_digits_in_row(8).unwrap().iter().count(), 9);
-        assert_eq!(mysudoku.used_digits_in_section(0).unwrap().iter().count(), 9);
-        assert_eq!(mysudoku.used_digits_in_section(1).unwrap().iter().count(), 9);
-        assert_eq!(mysudoku.used_digits_in_section(2).unwrap().iter().count(), 9);
-        assert_eq!(mysudoku.used_digits_in_section(3).unwrap().iter().count(), 9);
-        assert_eq!(mysudoku.used_digits_in_section(4).unwrap().iter().count(), 9);
-        assert_eq!(mysudoku.used_digits_in_section(5).unwrap().iter().count(), 9);
-        assert_eq!(mysudoku.used_digits_in_section(6).unwrap().iter().count(), 9);
-        assert_eq!(mysudoku.used_digits_in_section(7).unwrap().iter().count(), 9);
-        assert_eq!(mysudoku.used_digits_in_section(8).unwrap().iter().count(), 9);
+        for i in 0usize..9usize {
+            assert_eq!(mysudoku.used_digits_in_column(i).unwrap().iter().count(), 9, "column {}", i);
+            assert_eq!(mysudoku.used_digits_in_row(i).unwrap().iter().count(), 9, "row {}", i);
+            assert_eq!(mysudoku.used_digits_in_section(i).unwrap().iter().count(), 9, "section {}", i)
+        }
     }
     #[test]
     fn test_sort_cells_by_freedom() {

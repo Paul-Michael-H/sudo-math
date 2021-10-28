@@ -86,7 +86,7 @@ impl DigitSet {
 
 #[cfg(test)]
 mod tests {
-    use super::{Digit, Digit::*, DigitSet, DigitValue};
+    use super::{Digit::*, DigitSet, DigitValue};
 
     #[test]
     fn test_if_digit_can_be_none() {
